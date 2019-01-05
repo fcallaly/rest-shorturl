@@ -55,3 +55,15 @@ jobs:
       - store_artifacts:
           path: ~/test-results
 
+      - setup_remote_docker:
+          docker_layer_caching: true
+
+      - run:
+          command: |
+            TAG=0.0.$CIRCLE_BUILD_NUM
+            echo "BUILDING $TAG"
+            docker build -t callalyf/restshorturl:$TAG -f deploy/Dockerfile .
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker push callalyf/restshorturl:$TAG
+            docker tag callalyf/restshorturl:$TAG callalyf/restshorturl:latest
+            docker push callalyf/restshorturl:latest
