@@ -67,4 +67,3 @@ jobs:
             docker push callalyf/restshorturl:$TAG
             docker tag callalyf/restshorturl:$TAG callalyf/restshorturl:latest
             docker push callalyf/restshorturl:latest
-
