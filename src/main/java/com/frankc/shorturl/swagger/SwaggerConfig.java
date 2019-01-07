@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.frankc.shorturl.controllers.ShortUrlController;
+import com.frankc.shorturl.controllers.ShortUrlRedirectController;
 import com.google.common.base.Predicate;
 
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -51,7 +52,8 @@ public class SwaggerConfig {
     }
 
     private Predicate<String> paths() {
-        return PathSelectors.ant(ShortUrlController.BASE_PATH + "**");
+        return PathSelectors.regex("^(" + ShortUrlController.BASE_PATH + "|"
+                            + ShortUrlRedirectController.BASE_PATH + ").*$");
     }
 
     private ApiInfo apiInfo() {

@@ -6,6 +6,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 import org.springframework.hateoas.ResourceSupport;
 
 import com.frankc.shorturl.controllers.ShortUrlController;
+import com.frankc.shorturl.controllers.ShortUrlRedirectController;
 import com.frankc.shorturl.entities.ShortUrl;
 
 /**
@@ -25,6 +26,9 @@ public class ShortUrlResource extends ResourceSupport {
         add(linkTo(methodOn(ShortUrlController.class)
                     .findShortUrl(shortUrl.getShortUrlPath()))
                     .withSelfRel());
+        add(linkTo(methodOn(ShortUrlRedirectController.class)
+                .redirectByShortUrl(shortUrl.getShortUrlPath()))
+                .withRel("exec_redirect"));
     }
 
     public ShortUrl getShortUrl() {
