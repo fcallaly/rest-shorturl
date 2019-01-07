@@ -32,6 +32,7 @@ import com.frankc.shorturl.controllers.exceptions.MaxPathGenerationRetriesExcept
 import com.frankc.shorturl.entities.ShortUrl;
 import com.frankc.shorturl.repositories.ShortUrlRepo;
 import com.frankc.shorturl.utils.ShortUrlPathGenerator;
+import com.frankc.shorturl.utils.RedirectUrlUtils;
 
 /**
  * ShortUrl Service layer default implementation.
@@ -70,15 +71,17 @@ public class ShortUrlServiceImpl implements ShortUrlService {
     public ShortUrl createShortUrl(final String redirectTo)
                                    throws IllegalArgumentException,
                                           MaxPathGenerationRetriesException {
+        String fixedRedirectTo = RedirectUrlUtils.fixUrlProtocol(redirectTo);
+
         try {
-            new URL(redirectTo);
+            new URL(fixedRedirectTo);
         } catch (MalformedURLException ex) {
             logger.error("Request to create shortUrl with invalid redirectTo:"
-                         + redirectTo);
+                         + fixedRedirectTo);
             throw new IllegalArgumentException();
         }
-        
-        ShortUrl newShortUrl = new ShortUrl(redirectTo);
+
+        ShortUrl newShortUrl = new ShortUrl(fixedRedirectTo);
 
         int numAttempts = 1;
         while (true) {

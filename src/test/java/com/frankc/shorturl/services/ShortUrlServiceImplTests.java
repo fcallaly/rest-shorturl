@@ -19,6 +19,7 @@ package com.frankc.shorturl.services;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
 
@@ -29,6 +30,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +45,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.frankc.shorturl.controllers.exceptions.MaxPathGenerationRetriesException;
 import com.frankc.shorturl.entities.ShortUrl;
 import com.frankc.shorturl.repositories.ShortUrlRepo;
+import com.frankc.shorturl.utils.RedirectUrlUtils;
 import com.frankc.shorturl.utils.ShortUrlPathGenerator;
 
 /**
@@ -122,9 +126,32 @@ public class ShortUrlServiceImplTests {
                      testShortUrl.getRedirectTo());
     }
 
+    @Test
+    public void createShortUrl_addsProtocolToRedirectTo() {
+        ShortUrl testShortUrl = new ShortUrl("www.noprotocol.com");
+
+        when(mockShortUrlRepo.save(isA(ShortUrl.class)))
+             .thenAnswer(new Answer<ShortUrl>() {
+                public ShortUrl answer(final InvocationOnMock invocation)
+                                       throws Throwable {
+                    Object[] args = invocation.getArguments();
+                    return (ShortUrl) args[0];
+                }
+             });
+
+        ShortUrl foundShortUrl = shortUrlService.createShortUrl(
+                                            testShortUrl.getRedirectTo());
+
+        assertThat("findByShortUrlPath should return ShortUrl",
+                   foundShortUrl, instanceOf(ShortUrl.class));
+        assertTrue("findByShortUrlPath should return correct data",
+                     foundShortUrl.getRedirectTo()
+                         .startsWith(RedirectUrlUtils.DEFAULT_URL_PROTOCOL));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void createShortUrl_invalidRedirectThrowsIllegalArg() {
-        shortUrlService.createShortUrl("ba;df3");
+        shortUrlService.createShortUrl("http://invalidport:-2");
     }
 
     @Test(expected = MaxPathGenerationRetriesException.class)
