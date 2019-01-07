@@ -28,7 +28,7 @@ public class ShortUrlResource extends ResourceSupport {
                     .withSelfRel());
         add(linkTo(methodOn(ShortUrlRedirectController.class)
                 .redirectByShortUrl(shortUrl.getShortUrlPath()))
-                .withRel("exec_redirect"));
+                .withRel("exec-redirect"));
     }
 
     public ShortUrl getShortUrl() {

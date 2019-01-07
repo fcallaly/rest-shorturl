@@ -32,8 +32,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -45,7 +43,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.frankc.shorturl.controllers.exceptions.MaxPathGenerationRetriesException;
 import com.frankc.shorturl.entities.ShortUrl;
 import com.frankc.shorturl.repositories.ShortUrlRepo;
-import com.frankc.shorturl.utils.RedirectUrlUtils;
+import com.frankc.shorturl.utils.RedirectUrlValidator;
 import com.frankc.shorturl.utils.ShortUrlPathGenerator;
 
 /**
@@ -58,9 +56,7 @@ import com.frankc.shorturl.utils.ShortUrlPathGenerator;
 @ActiveProfiles("nojpa")
 public class ShortUrlServiceImplTests {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    private final static String TEST_SHORTURLPATH = "abcdABCD1234";
+    private static final String TEST_SHORTURLPATH = "abcdABCD1234";
 
     private final AtomicLong counter = new AtomicLong();
 
@@ -146,7 +142,7 @@ public class ShortUrlServiceImplTests {
                    foundShortUrl, instanceOf(ShortUrl.class));
         assertTrue("findByShortUrlPath should return correct data",
                      foundShortUrl.getRedirectTo()
-                         .startsWith(RedirectUrlUtils.DEFAULT_URL_PROTOCOL));
+                     .startsWith(RedirectUrlValidator.DEFAULT_URL_PROTOCOL));
     }
 
     @Test(expected = IllegalArgumentException.class)

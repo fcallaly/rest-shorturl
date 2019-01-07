@@ -16,19 +16,33 @@
  ******************************************************************************/
 package com.frankc.shorturl.utils;
 
+import java.net.MalformedURLException;
 import java.util.regex.Pattern;
 
-public class RedirectUrlUtils {
+import org.apache.commons.validator.routines.UrlValidator;
+import org.springframework.stereotype.Component;
+
+@Component
+public class RedirectUrlValidator {
+
+    public static final UrlValidator URL_VALIDATOR = new UrlValidator();
 
     public static final String DEFAULT_URL_PROTOCOL = "http://";
 
     private static final Pattern URL_WITH_PROTOCOL =
             Pattern.compile("(?i)^(https?|ftp|file)://.*$");
 
-    public static String fixUrlProtocol(final String url) {
+    public String fixUrlProtocol(final String url) {
         if (URL_WITH_PROTOCOL.matcher(url).matches()) {
             return url;
         }
         return DEFAULT_URL_PROTOCOL + url;
+    }
+
+    public void validateUrl(final String url)
+                            throws MalformedURLException {
+        if (!URL_VALIDATOR.isValid(url)) {
+            throw new MalformedURLException();
+        }
     }
 }

@@ -5,7 +5,9 @@ See Swagger UI at <base_url>/swagger-ui.html for API documentation
 
 CircleCi config is in .circleci/config.yml
 
-Currently circleci is deploying builds as a Docker container to [dockerhub](http://hub.docker.com/r/callalyf/restshorturl)
+Currently circleci is deploying builds as a Docker container to <http://hub.docker.com/r/callalyf/restshorturl>
+
+Latest docker tag is running at <http://140.203.205.15:8080/swagger-ui.html>
 
 **Example of running docker image**:
 
