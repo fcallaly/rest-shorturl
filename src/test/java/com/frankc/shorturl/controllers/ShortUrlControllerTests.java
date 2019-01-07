@@ -110,6 +110,22 @@ public class ShortUrlControllerTests {
     }
 
     @Test
+    public void findAllShortUrls_invalidPageSizeReturnsBadRequest()
+                                                throws Exception {
+        this.mockMvc.perform(get(ShortUrlController.BASE_PATH)
+                        .param("pageSize", "-200"))
+                    .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findAllShortUrls_invalidPageNumReturnsBadRequest()
+                                                throws Exception {
+        this.mockMvc.perform(get(ShortUrlController.BASE_PATH)
+                        .param("pageNumber", "-200"))
+                    .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void findShortUrl_returnsOk() throws Exception {
         ShortUrl testShortUrl = new ShortUrl("http://www.testfind.com");
         testShortUrl.setShortUrlPath(TEST_SHORTURLPATH);

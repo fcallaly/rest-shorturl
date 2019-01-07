@@ -81,16 +81,21 @@ public class ShortUrlController {
      */
     @ApiOperation(value = "Find all shortUrls on the system")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success")})
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 400, message = "Invalid parameters given")})
     @GetMapping(produces = "application/hal+json")
-    public Resources<ShortUrlResource> findAllShortUrls(
+    public HttpEntity<Resources<ShortUrlResource>> findAllShortUrls(
                 @RequestParam(defaultValue = "0", required = false)
-                    final Integer pageNumber,
+                                        final Integer pageNumber,
                 @RequestParam(defaultValue = "10", required = false)
-                    Integer pageSize) {
+                                        Integer pageSize) {
         logger.debug("GET findAllShortUrls");
 
-        if(pageSize > maxPageSize) {
+        if (pageSize < 0 || pageNumber < 0) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        if (pageSize > maxPageSize) {
             logger.warn("Truncating page size from " + pageSize
                         + " to " + maxPageSize);
             pageSize = maxPageSize;
@@ -103,11 +108,12 @@ public class ShortUrlController {
                     .map(ShortUrlResource::new)
                     .collect(Collectors.toList());
 
-        return new Resources<>(
+        return new ResponseEntity<>(
+                new Resources<>(
                     collection,
                     linkTo(methodOn(this.getClass())
                         .findAllShortUrls(pageNumber, pageSize))
-                        .withRel("self"));
+                        .withRel("self")), HttpStatus.OK);
     }
 
     /**
