@@ -35,7 +35,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.frankc.shorturl.entities.ShortUrl;
 
 @RunWith(SpringRunner.class)
-@ActiveProfiles("dev")
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ShortUrlRepoTests {
