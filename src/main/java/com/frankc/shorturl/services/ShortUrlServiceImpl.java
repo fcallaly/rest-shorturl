@@ -26,13 +26,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.frankc.shorturl.controllers.exceptions.MaxPathGenerationRetriesException;
 import com.frankc.shorturl.entities.ShortUrl;
 import com.frankc.shorturl.repositories.ShortUrlRepo;
-import com.frankc.shorturl.utils.ShortUrlPathGenerator;
 import com.frankc.shorturl.utils.RedirectUrlValidator;
+import com.frankc.shorturl.utils.ShortUrlPathGenerator;
 
 /**
  * ShortUrl Service layer default implementation.
@@ -56,8 +57,8 @@ public class ShortUrlServiceImpl implements ShortUrlService {
     @Value("${com.frankc.shorturl.service.maxShortUrlPathGenRetries:3}")
     private int maxShortUrlPathGenerationRetries;
 
-    public List<ShortUrl> findAll() {
-        return shortUrlRepo.findAll();
+    public List<ShortUrl> findAll(final Pageable pageRequest) {
+        return shortUrlRepo.findAll(pageRequest).getContent();
     }
 
     public ShortUrl findByShortUrlPath(final String shortUrlPath)

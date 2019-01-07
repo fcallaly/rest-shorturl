@@ -22,7 +22,8 @@ public class ShortUrlResource extends ResourceSupport {
         this.shortUrl = shortUrl;
 
         add(linkTo(methodOn(ShortUrlController.class)
-                   .findAllShortUrls()).withRel("all-urls"));
+                    .findAllShortUrls(null, null))
+                    .withRel("all-urls").expand());
         add(linkTo(methodOn(ShortUrlController.class)
                     .findShortUrl(shortUrl.getShortUrlPath()))
                     .withSelfRel());

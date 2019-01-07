@@ -26,6 +26,9 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -36,6 +39,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -67,6 +71,9 @@ public class ShortUrlController {
     @Autowired
     private ShortUrlService shortUrlService;
 
+    @Value("${com.frankc.shorturl.controller.maxPageSize:50}")
+    private int maxPageSize;
+
     /**
      * Find a collection of all ShortUrls in the repository.
      *
@@ -76,17 +83,30 @@ public class ShortUrlController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success")})
     @GetMapping(produces = "application/hal+json")
-    public Resources<ShortUrlResource> findAllShortUrls() {
+    public Resources<ShortUrlResource> findAllShortUrls(
+                @RequestParam(defaultValue = "0", required = false)
+                    final Integer pageNumber,
+                @RequestParam(defaultValue = "10", required = false)
+                    Integer pageSize) {
         logger.debug("GET findAllShortUrls");
 
+        if(pageSize > maxPageSize) {
+            logger.warn("Truncating page size from " + pageSize
+                        + " to " + maxPageSize);
+            pageSize = maxPageSize;
+        }
+
+        Pageable pageRequest = PageRequest.of(pageNumber, pageSize);
+
         List<ShortUrlResource> collection =
-                shortUrlService.findAll().stream()
+                shortUrlService.findAll(pageRequest).stream()
                     .map(ShortUrlResource::new)
                     .collect(Collectors.toList());
 
         return new Resources<>(
                     collection,
-                    linkTo(methodOn(this.getClass()).findAllShortUrls())
+                    linkTo(methodOn(this.getClass())
+                        .findAllShortUrls(pageNumber, pageSize))
                         .withRel("self"));
     }
 

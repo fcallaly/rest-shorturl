@@ -16,7 +16,10 @@
  ******************************************************************************/
 package com.frankc.shorturl.controllers;
 
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -29,11 +32,13 @@ import java.util.NoSuchElementException;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -69,7 +74,7 @@ public class ShortUrlControllerTests {
 
     @Test
     public void findAllShortUrls_returnsList() throws Exception {
-        when(mockShortUrlService.findAll())
+        when(mockShortUrlService.findAll(any()))
             .thenReturn(new ArrayList<ShortUrl>());
 
         MvcResult result = this.mockMvc
@@ -77,6 +82,28 @@ public class ShortUrlControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").isNumber())
                 .andReturn();
+
+        logger.info("Result from findAllShortUrl: "
+                    + result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void findAllShortUrls_truncatesLargePageSize() throws Exception {
+        Integer largePageSize = 20000;
+        when(mockShortUrlService.findAll(any()))
+            .thenReturn(new ArrayList<ShortUrl>());
+
+        MvcResult result = this.mockMvc
+                .perform(get(ShortUrlController.BASE_PATH)
+                    .param("pageSize", largePageSize.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").isNumber())
+                .andReturn();
+
+        ArgumentCaptor<Pageable> argument =
+                        ArgumentCaptor.forClass(Pageable.class);
+        verify(mockShortUrlService).findAll(argument.capture());
+        assertTrue(argument.getValue().getPageNumber() < largePageSize);
 
         logger.info("Result from findAllShortUrl: "
                     + result.getResponse().getContentAsString());
@@ -143,7 +170,8 @@ public class ShortUrlControllerTests {
     }
 
     @Test
-    public void createShortUrl_withInvalidRedirectReturnsBadRequest() throws Exception {
+    public void createShortUrl_withInvalidRedirectReturnsBadRequest()
+                                                    throws Exception {
         ShortUrl testShortUrl = new ShortUrl("adf;ksie");
 
         when(mockShortUrlService

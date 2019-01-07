@@ -16,6 +16,7 @@
  ******************************************************************************/
 package com.frankc.shorturl.services;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -37,6 +38,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -47,7 +51,7 @@ import com.frankc.shorturl.utils.RedirectUrlValidator;
 import com.frankc.shorturl.utils.ShortUrlPathGenerator;
 
 /**
- * Unit Tests for ShortUrlController.
+ * Unit Tests for ShortUrlServiceImpl.
  *
  * @author Frank Callaly
  */
@@ -71,11 +75,12 @@ public class ShortUrlServiceImplTests {
 
     @Test
     public void findAll_returnsList() {
-        when(mockShortUrlRepo.findAll())
-            .thenReturn(new ArrayList<ShortUrl>());
+        when(mockShortUrlRepo.findAll(any(Pageable.class)))
+            .thenReturn(new PageImpl<ShortUrl>(new ArrayList<ShortUrl>()));
 
         assertThat("findAll should return List",
-                   shortUrlService.findAll(), instanceOf(List.class));
+                   shortUrlService.findAll(PageRequest.of(0,  20)),
+                   instanceOf(List.class));
     }
 
     @Test
