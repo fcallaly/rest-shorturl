@@ -1,5 +1,5 @@
 # rest-shorturl
-RESTful service for creating and using short URLs
+A Spring Boot application implementing a RESTful service for creating and using short URLs
 
 See Swagger UI at <base_url>/swagger-ui.html for API documentation
 
