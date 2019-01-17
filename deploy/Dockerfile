@@ -9,5 +9,7 @@ COPY deploy/startapp.sh .
 
 EXPOSE 8080
 
+ENV SPRING_PROFILE prod
+
 RUN apk add --no-cache bash
 ENTRYPOINT ["/bin/bash", "startapp.sh"]
