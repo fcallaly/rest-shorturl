@@ -16,7 +16,9 @@ The script run.sh can be used to get the app running for testing. It will requir
 This will run:
 * ./mvnw clean package  - uses maven to compile, run unit tests and package the jar. Requires a java-8 jdk.
 * docker-compose build - uses deploy/docker-compose.yml to build a restshorturl:dev docker image. Requires docker, docker-compose.
-* docker-compose up - starts a containerized mysql instance and links it to a restshorturl:dev container. The mysql schema will be initialized from src/main/resources/schema.sql
+* docker-compose up - starts a containerized mysql instance and links it to a restshorturl:dev container. The mysql schema will be initialized from src/main/resources/schema.sql.
+
+The restshorturl container will be accessible on port 8080 (e.g. <http://localhost:8080/swagger-ui.html>). The port can be changed by changing the ports config in deploy/docker-compose.yml
 
 **Example of running docker image**:
 
